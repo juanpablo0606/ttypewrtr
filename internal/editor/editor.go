@@ -40,8 +40,6 @@ func New(path string) (Model, error) {
 	m.savedContent = content
 	m.ta.Focus()
 
-	m.path = filepath.Base(path)
-
 	return m, nil
 }
 
@@ -69,9 +67,16 @@ func (m Model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 			m.status = "Saved!"
 			m.savedContent = m.ta.Value()
 			return m, nil
+
 		}
 		m.quitWarned = false
 		m.status = ""
+
+		//key map
+		if act, ok := keymap[msg.String()]; ok {
+			act(&m)
+			return m, nil
+		}
 	case tea.WindowSizeMsg:
 		m.ta.SetWidth(msg.Width)
 		m.ta.SetHeight(msg.Height - statusBarHeight)
@@ -95,7 +100,7 @@ func (m Model) View() tea.View {
 
 func (m Model) save() error {
 	//0644 -> puedo leer y escribir, los demás solo leer
-	return os.WriteFile(m.path, []byte(m.ta.Value()), 0644)
+	return os.WriteFile(filepath.Base(m.path), []byte(m.ta.Value()), 0644)
 }
 
 func (m Model) hasChanges() bool {

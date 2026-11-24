@@ -37,7 +37,7 @@ func headingLevel(line string) int {
 	level := len(line) - len(rest)
 
 	//check if it's a heading (heading needs a space after "#")
-	if strings.HasPrefix(rest, " ") && level <= 6 {
+	if (strings.HasPrefix(rest, " ") || rest == "") && level <= 6 {
 		return level
 	}
 	return 0
