@@ -3,8 +3,11 @@ module github.com/juanpablo0606/ttypewrtr
 go 1.27.3
 
 require (
-	charm.land/bubbles/v2 v2.2.2 // indirect
-	charm.land/bubbletea/v2 v2.1.2 // indirect
+	charm.land/bubbles/v2 v2.2.2
+	charm.land/bubbletea/v2 v2.1.2
+)
+
+require (
 	charm.land/lipgloss/v2 v2.0.6 // indirect
 	github.com/atotto/clipboard v0.1.4 // indirect
 	github.com/charmbracelet/colorprofile v0.4.3 // indirect

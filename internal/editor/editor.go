@@ -48,10 +48,9 @@ func (m Model) Init() tea.Cmd {
 func (m Model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 	switch msg := msg.(type) {
 	case tea.KeyPressMsg:
-		m.status = "[+]"
 		switch msg.String() {
 		case "ctrl+q", "ctrl+c":
-			if !m.quitWarned {
+			if m.hasChanges() && !m.quitWarned {
 				m.status = "¿Save before you leave?"
 				m.quitWarned = true
 				return m, nil
@@ -61,15 +60,18 @@ func (m Model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 			err := m.save()
 			if err != nil {
 				m.status = err.Error()
+				return m, nil
 			}
 			m.status = "Saved!"
 			m.savedContent = m.ta.Value()
 			return m, nil
 		}
 		m.quitWarned = false
+		m.status = ""
 	case tea.WindowSizeMsg:
 		m.ta.SetWidth(msg.Width)
-		m.ta.SetHeight(msg.Height - 5)
+		statusBarHeight := 5
+		m.ta.SetHeight(msg.Height - statusBarHeight)
 		return m, nil
 	}
 
@@ -80,12 +82,19 @@ func (m Model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 }
 
 func (m Model) View() tea.View {
-
-	statusBar := fmt.Sprintf("%s %s", m.path, m.status)
+	saved := ""
+	if m.hasChanges() {
+		saved = "[+]"
+	}
+	statusBar := fmt.Sprintf("%s %s %s", m.path, saved, m.status)
 	return tea.NewView(statusBar + "\n" + m.ta.View())
 }
 
 func (m Model) save() error {
 	//0644 -> puedo leer y escribir, los demás solo leer
 	return os.WriteFile(m.path, []byte(m.ta.Value()), 0644)
+}
+
+func (m Model) hasChanges() bool {
+	return m.savedContent != m.ta.Value()
 }
