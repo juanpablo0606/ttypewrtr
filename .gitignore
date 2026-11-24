@@ -1,0 +1,7 @@
+# binario compilado
+/ttypewrtr
+*.exe
+
+# archivos de prueba que generes al usar el editor
+*.md
+!README.md
