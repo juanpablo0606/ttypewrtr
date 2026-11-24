@@ -33,6 +33,8 @@ func New(path string) (Model, error) {
 		return m, err
 	}
 
+	m.path = path
+
 	content := string(data)
 
 	m.ta = textarea.New()

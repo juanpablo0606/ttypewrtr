@@ -13,8 +13,8 @@ var keymap = map[string]action{
 	"alt+6": func(m *Model) { m.applyLine(heading(6)) },
 	"alt+b": func(m *Model) { m.applyWord("**") },
 	"alt+i": func(m *Model) { m.applyWord("*") },
-	"alt+q": func(m *Model) { m.applyLine(prefix(">")) },
-	"alt+l": func(m *Model) { m.applyLine(prefix("-")) },
+	"alt+q": func(m *Model) { m.applyLine(prefix("> ")) },
+	"alt+l": func(m *Model) { m.applyLine(prefix("- ")) },
 }
 
 func heading(level int) func(string) string {

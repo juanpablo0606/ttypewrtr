@@ -16,6 +16,9 @@ func (m *Model) applyLine(fn func(string) string) {
 
 	diff := len([]rune(newLine)) - len([]rune(oldLine))
 	newCol := m.ta.Column() + diff
+	if newCol < 0 {
+		newCol = 0
+	}
 
 	m.replaceCurrentLine(newLine, newCol)
 }
