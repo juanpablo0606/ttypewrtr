@@ -2,16 +2,11 @@ package main
 
 import (
 	"fmt"
-	"log"
 	"os"
 
-	"charm.land/bubbles/v2/textarea"
+	tea "charm.land/bubbletea/v2"
 	"github.com/juanpablo0606/ttypewrtr/internal/editor"
 )
-
-type app struct {
-	ta textarea.Model
-}
 
 func main() {
 
@@ -21,9 +16,17 @@ func main() {
 	}
 	path := os.Args[1]
 
+	m, err := editor.New(path)
+	if err != nil {
+		fmt.Println(err)
+		os.Exit(1)
+	}
+
 	//initialize bubbletea
-	if _, err := editor.New(editor.Model{}, path); err != nil {
-		log.Fatal(err)
+	p := tea.NewProgram(m)
+	if _, err := p.Run(); err != nil {
+		fmt.Println(err)
+		os.Exit(1)
 	}
 
 }

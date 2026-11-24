@@ -17,17 +17,17 @@ type Model struct {
 	err   error
 }
 
-func New(m Model, path string) (Model, error) {
+func New(path string) (Model, error) {
 
+	m := Model{}
 	m.path = path
 
 	data, err := os.ReadFile(m.path)
 	if errors.Is(err, fs.ErrNotExist) {
-		//don't know what to do.
+		//si está vacio no necesitamos cargar nada.
 	} else if err != nil {
 		//imprimir error al abrir el archivo
-		fmt.Println(err)
-		os.Exit(1)
+		return m, err
 	}
 
 	content := string(data)
@@ -36,11 +36,7 @@ func New(m Model, path string) (Model, error) {
 	m.ta.SetValue(content)
 	m.ta.Focus()
 
-	p := tea.NewProgram(m)
-	if _, err := p.Run(); err != nil {
-		return Model{}, err
-	}
-	return Model{}, nil
+	return m, nil
 }
 
 func (m Model) Init() tea.Cmd {
@@ -54,8 +50,9 @@ func (m Model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 		case "ctrl+q", "ctrl+c":
 			return m, tea.Quit
 		case "ctrl+s":
-			//me falta chequear error, a donde va el error?
-			m.save()
+			err := m.save()
+			//guardo el error
+			m.err = err
 			m.saved = true
 			return m, nil
 		}
@@ -72,7 +69,7 @@ func (m Model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 
 func (m Model) View() tea.View {
 
-	statusBar := fmt.Sprintf("%s %v", m.path, m.saved)
+	statusBar := fmt.Sprintf("%s %v %s", m.path, m.saved, m.err)
 	return tea.NewView(statusBar + "\n" + m.ta.View())
 }
 
