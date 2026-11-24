@@ -11,10 +11,11 @@ import (
 )
 
 type Model struct {
-	ta    textarea.Model
-	path  string
-	saved bool
-	err   error
+	ta           textarea.Model
+	path         string
+	savedContent string
+	status       string
+	quitWarned   bool //hay cambios sin guardar?
 }
 
 func New(path string) (Model, error) {
@@ -34,6 +35,7 @@ func New(path string) (Model, error) {
 
 	m.ta = textarea.New()
 	m.ta.SetValue(content)
+	m.savedContent = content
 	m.ta.Focus()
 
 	return m, nil
@@ -46,18 +48,28 @@ func (m Model) Init() tea.Cmd {
 func (m Model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 	switch msg := msg.(type) {
 	case tea.KeyPressMsg:
+		m.status = "[+]"
 		switch msg.String() {
 		case "ctrl+q", "ctrl+c":
+			if !m.quitWarned {
+				m.status = "¿Save before you leave?"
+				m.quitWarned = true
+				return m, nil
+			}
 			return m, tea.Quit
 		case "ctrl+s":
 			err := m.save()
-			//guardo el error
-			m.err = err
-			m.saved = true
+			if err != nil {
+				m.status = err.Error()
+			}
+			m.status = "Saved!"
+			m.savedContent = m.ta.Value()
 			return m, nil
 		}
+		m.quitWarned = false
 	case tea.WindowSizeMsg:
-
+		m.ta.SetWidth(msg.Width)
+		m.ta.SetHeight(msg.Height - 5)
 		return m, nil
 	}
 
@@ -69,7 +81,7 @@ func (m Model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 
 func (m Model) View() tea.View {
 
-	statusBar := fmt.Sprintf("%s %v %s", m.path, m.saved, m.err)
+	statusBar := fmt.Sprintf("%s %s", m.path, m.status)
 	return tea.NewView(statusBar + "\n" + m.ta.View())
 }
 
