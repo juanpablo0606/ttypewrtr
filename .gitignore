@@ -5,3 +5,5 @@
 # archivos de prueba que generes al usar el editor
 *.md
 !README.md
+
+/internal/commands/line_test.go
