@@ -5,10 +5,13 @@ import (
 	"fmt"
 	"io/fs"
 	"os"
+	"path/filepath"
 
 	"charm.land/bubbles/v2/textarea"
 	tea "charm.land/bubbletea/v2"
 )
+
+const statusBarHeight = 3
 
 type Model struct {
 	ta           textarea.Model
@@ -21,9 +24,8 @@ type Model struct {
 func New(path string) (Model, error) {
 
 	m := Model{}
-	m.path = path
 
-	data, err := os.ReadFile(m.path)
+	data, err := os.ReadFile(path)
 	if errors.Is(err, fs.ErrNotExist) {
 		//si está vacio no necesitamos cargar nada.
 	} else if err != nil {
@@ -38,6 +40,8 @@ func New(path string) (Model, error) {
 	m.savedContent = content
 	m.ta.Focus()
 
+	m.path = filepath.Base(path)
+
 	return m, nil
 }
 
@@ -49,9 +53,9 @@ func (m Model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 	switch msg := msg.(type) {
 	case tea.KeyPressMsg:
 		switch msg.String() {
-		case "ctrl+q", "ctrl+c":
+		case "ctrl+q":
 			if m.hasChanges() && !m.quitWarned {
-				m.status = "¿Save before you leave?"
+				m.status = "Unsaved changes. Ctrl+S to save, Ctrl+Q to quit"
 				m.quitWarned = true
 				return m, nil
 			}
@@ -70,7 +74,6 @@ func (m Model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 		m.status = ""
 	case tea.WindowSizeMsg:
 		m.ta.SetWidth(msg.Width)
-		statusBarHeight := 5
 		m.ta.SetHeight(msg.Height - statusBarHeight)
 		return m, nil
 	}
