@@ -96,13 +96,13 @@ func (m Model) View() tea.View {
 	if m.hasChanges() {
 		saved = "[+]"
 	}
-	statusBar := fmt.Sprintf("%s %s %s", m.path, saved, m.status)
+	statusBar := fmt.Sprintf("%s %s %s", filepath.Base(m.path), saved, m.status)
 	return tea.NewView(statusBar + "\n" + m.ta.View())
 }
 
 func (m Model) save() error {
 	//0644 -> puedo leer y escribir, los demás solo leer
-	return os.WriteFile(filepath.Base(m.path), []byte(m.ta.Value()), 0644)
+	return os.WriteFile(m.path, []byte(m.ta.Value()), 0644)
 }
 
 func (m Model) hasChanges() bool {
