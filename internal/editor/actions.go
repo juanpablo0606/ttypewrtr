@@ -95,7 +95,7 @@ func (m *Model) quit() tea.Cmd {
 		quit := m.keyFor("quit")
 		save := m.keyFor("save")
 
-		m.status = "Unsaved changes. Press" + save + " to save, press " + quit + " to quit"
+		m.status = "Unsaved changes. Press " + save + " to save, press " + quit + " to quit"
 		m.quitWarned = true
 		return nil
 	}
