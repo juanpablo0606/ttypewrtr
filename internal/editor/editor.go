@@ -19,15 +19,19 @@ type Model struct {
 	savedContent string
 	status       string
 	quitWarned   bool //hay cambios sin guardar?
+	keymap       map[string]string
 }
 
-func New(path string) (Model, error) {
-
+func New(path string, keys map[string]string) (Model, error) {
+	km, err := buildKeymap(keys)
+	if err != nil {
+		return Model{}, err
+	}
 	data, err := os.ReadFile(path)
 	if errors.Is(err, fs.ErrNotExist) {
-		return Model{}, err
+		//empty
 	} else if err != nil {
-		//imprimir error al abrir el archivo
+		//err when opening
 		return Model{}, err
 	}
 
@@ -41,6 +45,7 @@ func New(path string) (Model, error) {
 		ta:           ta,
 		path:         path,
 		savedContent: content,
+		keymap:       km,
 	}, nil
 }
 

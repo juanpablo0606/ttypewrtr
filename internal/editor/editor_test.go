@@ -5,6 +5,8 @@ import (
 	"path/filepath"
 	"strings"
 	"testing"
+
+	"github.com/juanpablo0606/ttypewrtr/internal/config"
 )
 
 // newTestModel creates a Model with the given content and puts the cursor
@@ -18,7 +20,7 @@ func newTestModel(t *testing.T, content string, row, col int) Model {
 		t.Fatal(err)
 	}
 
-	m, err := New(path)
+	m, err := New(path, config.Default().Keys)
 	if err != nil {
 		t.Fatalf("New(%q) returned error: %v", path, err)
 	}
@@ -56,7 +58,7 @@ func TestNewExistingFile(t *testing.T) {
 func TestNewMissingFileStartsEmpty(t *testing.T) {
 	path := filepath.Join(t.TempDir(), "does-not-exist.md")
 
-	m, err := New(path)
+	m, err := New(path, config.Default().Keys)
 	if err != nil {
 		t.Fatalf("New on a missing file returned error: %v", err)
 	}
@@ -70,7 +72,7 @@ func TestNewMissingFileStartsEmpty(t *testing.T) {
 
 func TestNewUnreadablePathReturnsError(t *testing.T) {
 	// A directory cannot be read as a file.
-	_, err := New(t.TempDir())
+	_, err := New(t.TempDir(), config.Default().Keys)
 	if err == nil {
 		t.Error("New on a directory should return an error")
 	}
@@ -87,7 +89,7 @@ func TestSaveWritesToFullPath(t *testing.T) {
 		t.Fatal(err)
 	}
 
-	m, err := New(path)
+	m, err := New(path, config.Default().Keys)
 	if err != nil {
 		t.Fatal(err)
 	}
