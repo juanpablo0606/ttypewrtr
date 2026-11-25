@@ -48,7 +48,7 @@ func Load(path string) (Config, error) {
 	if errors.Is(err, fs.ErrNotExist) {
 		return cfg, nil
 	} else if err != nil {
-		return Config{}, err
+		return Config{}, fmt.Errorf("%s: %w", path, err)
 	}
 
 	if undecoded := md.Undecoded(); len(undecoded) > 0 {

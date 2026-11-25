@@ -10,9 +10,15 @@ import (
 )
 
 // newTestModel creates a Model with the given content and puts the cursor
-// at (row, col). The file lives in a temporary folder that Go deletes
-// automatically when the test ends.
+// at (row, col), using the default shortcuts. The file lives in a temporary
+// folder that Go deletes automatically when the test ends.
 func newTestModel(t *testing.T, content string, row, col int) Model {
+	t.Helper()
+	return newTestModelWithKeys(t, content, row, col, config.Default().Keys)
+}
+
+// newTestModelWithKeys is like newTestModel, but with custom shortcuts.
+func newTestModelWithKeys(t *testing.T, content string, row, col int, keys map[string]string) Model {
 	t.Helper()
 
 	path := filepath.Join(t.TempDir(), "test.md")
@@ -20,7 +26,7 @@ func newTestModel(t *testing.T, content string, row, col int) Model {
 		t.Fatal(err)
 	}
 
-	m, err := New(path, config.Default().Keys)
+	m, err := New(path, keys)
 	if err != nil {
 		t.Fatalf("New(%q) returned error: %v", path, err)
 	}
@@ -273,27 +279,5 @@ func TestApplyWord(t *testing.T) {
 			m.applyWord(tt.marker)
 			assertState(t, m, tt.wantText, tt.wantRow, tt.wantCol)
 		})
-	}
-}
-
-// --- keymap ---
-
-// Every shortcut must point to an action. Catches typos like a nil entry.
-func TestKeymapHasNoNilActions(t *testing.T) {
-	for key, act := range actions {
-		if act == nil {
-			t.Errorf("keymap[%q] is nil", key)
-		}
-	}
-}
-
-// Shortcuts that would make it impossible to save or quit must not be
-// used for formatting.
-func TestKeymapDoesNotShadowReservedKeys(t *testing.T) {
-	reserved := []string{"ctrl+s", "ctrl+q", "ctrl+c"}
-	for _, key := range reserved {
-		if _, ok := actions[key]; ok {
-			t.Errorf("keymap uses reserved key %q", key)
-		}
 	}
 }

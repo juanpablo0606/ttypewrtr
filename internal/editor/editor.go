@@ -71,12 +71,6 @@ func (m Model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 		if bound {
 			return m, actions[name](&m)
 		}
-
-		//key map
-		if act, ok := actions[msg.String()]; ok {
-			act(&m)
-			return m, nil
-		}
 	case tea.WindowSizeMsg:
 		m.ta.SetWidth(msg.Width)
 		m.ta.SetHeight(msg.Height - statusBarHeight)
