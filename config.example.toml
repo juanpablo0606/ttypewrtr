@@ -1,13 +1,19 @@
+#copies into os.UserConfigDir() /typewrtr/config.toml
+#what's not changed will take a default value
 [keys]
+#headers
 h1 = "alt+1"
 h2 = "alt+2"
 h3 = "alt+3"
 h4 = "alt+4"
 h5 = "alt+5"
 h6 = "alt+6"
+#word modification 
 bold = "alt+b" 
 italic = "alt+i"
+#line modification
 quote = "alt+q"
 list = "alt+l"
+#basic commands
 save = "ctrl+s"
 quit = "ctrl+q"

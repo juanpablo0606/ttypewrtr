@@ -92,7 +92,14 @@ func (m *Model) saveFile() tea.Cmd {
 // quit exits, but asks for confirmation first if there are unsaved changes.
 func (m *Model) quit() tea.Cmd {
 	if m.hasChanges() && !m.quitWarned {
-		m.status = "Unsaved changes. Ctrl+S to save, Ctrl+Q to quit"
+		key := ""
+		for k, name := range m.keymap {
+			if name == "quit" {
+				key = k
+				break
+			}
+		}
+		m.status = "Unsaved changes. press " + key + " to quit"
 		m.quitWarned = true
 		return nil
 	}
