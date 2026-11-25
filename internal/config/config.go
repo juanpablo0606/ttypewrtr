@@ -2,6 +2,7 @@ package config
 
 import (
 	"errors"
+	"fmt"
 	"io/fs"
 	"os"
 	"path/filepath"
@@ -26,6 +27,8 @@ func Default() Config {
 			"italic": "alt+i",
 			"quote":  "alt+q",
 			"list":   "alt+l",
+			"quit":   "ctrl+q",
+			"save":   "ctrl+s",
 		},
 	}
 }
@@ -33,23 +36,23 @@ func Default() Config {
 func Path() (string, error) {
 	p, err := os.UserConfigDir()
 	if err != nil {
-		return "", nil
+		return "", err
 	}
-	return filepath.Join(p, "config.toml"), nil
+	return filepath.Join(p, "ttypewrtr", "config.toml"), nil
 
 }
 
 func Load(path string) (Config, error) {
 	cfg := Default()
-	path, err := Path()
-	if err != nil {
-		return cfg, err
-	}
-	_, err = toml.DecodeFile(path, &cfg)
+	md, err := toml.DecodeFile(path, &cfg)
 	if errors.Is(err, fs.ErrNotExist) {
-		return Model{}, err
+		return cfg, nil
 	} else if err != nil {
-		return Model{}, err
+		return Config{}, err
 	}
 
+	if undecoded := md.Undecoded(); len(undecoded) > 0 {
+		return Config{}, fmt.Errorf("unkown setting %q in %s", undecoded[0].String(), path)
+	}
+	return cfg, nil
 }

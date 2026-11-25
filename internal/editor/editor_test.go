@@ -278,7 +278,7 @@ func TestApplyWord(t *testing.T) {
 
 // Every shortcut must point to an action. Catches typos like a nil entry.
 func TestKeymapHasNoNilActions(t *testing.T) {
-	for key, act := range keymap {
+	for key, act := range actions {
 		if act == nil {
 			t.Errorf("keymap[%q] is nil", key)
 		}
@@ -290,7 +290,7 @@ func TestKeymapHasNoNilActions(t *testing.T) {
 func TestKeymapDoesNotShadowReservedKeys(t *testing.T) {
 	reserved := []string{"ctrl+s", "ctrl+q", "ctrl+c"}
 	for _, key := range reserved {
-		if _, ok := keymap[key]; ok {
+		if _, ok := actions[key]; ok {
 			t.Errorf("keymap uses reserved key %q", key)
 		}
 	}

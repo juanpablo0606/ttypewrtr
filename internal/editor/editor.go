@@ -74,7 +74,7 @@ func (m Model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 		m.status = ""
 
 		//key map
-		if act, ok := keymap[msg.String()]; ok {
+		if act, ok := actions[msg.String()]; ok {
 			act(&m)
 			return m, nil
 		}
@@ -91,11 +91,11 @@ func (m Model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 }
 
 func (m Model) View() tea.View {
-	saved := ""
+	modified := ""
 	if m.hasChanges() {
-		saved = "[+]"
+		modified = "[+]"
 	}
-	statusBar := fmt.Sprintf("%s %s %s", filepath.Base(m.path), saved, m.status)
+	statusBar := fmt.Sprintf("%s %s %s", filepath.Base(m.path), modified, m.status)
 	return tea.NewView(statusBar + "\n" + m.ta.View())
 }
 
