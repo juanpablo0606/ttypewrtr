@@ -56,27 +56,21 @@ func (m Model) Init() tea.Cmd {
 func (m Model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 	switch msg := msg.(type) {
 	case tea.KeyPressMsg:
-		switch msg.String() {
-		case "ctrl+q":
-			if m.hasChanges() && !m.quitWarned {
-				m.status = "Unsaved changes. Ctrl+S to save, Ctrl+Q to quit"
-				m.quitWarned = true
-				return m, nil
-			}
-			return m, tea.Quit
-		case "ctrl+s":
-			err := m.save()
-			if err != nil {
-				m.status = err.Error()
-				return m, nil
-			}
-			m.status = "Saved!"
-			m.savedContent = m.ta.Value()
-			return m, nil
+		key := msg.String()
+		name, bound := m.keymap[key]
 
+		if key == emergencyQuitKey {
+			name, bound = "quit", true
 		}
-		m.quitWarned = false
+
+		if name != "quit" {
+			m.quitWarned = false
+		}
 		m.status = ""
+
+		if bound {
+			return m, actions[name](&m)
+		}
 
 		//key map
 		if act, ok := actions[msg.String()]; ok {
