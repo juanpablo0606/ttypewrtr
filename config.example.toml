@@ -1,4 +1,4 @@
-#copies into os.UserConfigDir() /typewrtr/config.toml
+#copies into os.UserConfigDir() /ttypewrtr/config.toml
 #what's not changed will take a default value
 [keys]
 #headers

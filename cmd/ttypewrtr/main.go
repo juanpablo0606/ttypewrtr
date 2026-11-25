@@ -11,12 +11,16 @@ import (
 
 func main() {
 	if len(os.Args) < 2 {
-		fmt.Fprintln(os.Stderr, fmt.Errorf("Missing arguments.\nUse: ttypewrtr <file.md>"))
+		fmt.Fprintln(os.Stderr, "Missing arguments.\nUse: ttypewrtr <file.md>")
 		os.Exit(1)
 	}
 
 	if os.Args[1] == "--config-path" {
-		path, _ := config.Path()
+		path, err := config.Path()
+		if err != nil {
+			fmt.Fprintln(os.Stderr, err)
+			os.Exit(1)
+		}
 		fmt.Println(path)
 		os.Exit(0)
 	}
