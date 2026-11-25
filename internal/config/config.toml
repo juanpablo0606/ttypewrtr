@@ -1,0 +1,11 @@
+[keys]
+h1 = "alt+1"
+h2 = "alt+2"
+h3 = "alt+3"
+h4 = "alt+4"
+h5 = "alt+5"
+h6 = "alt+6"
+bold = "alt+b" 
+italic = "alt+i"
+quote = "alt+q"
+list = "alt+l"

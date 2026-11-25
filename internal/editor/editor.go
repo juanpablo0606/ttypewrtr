@@ -23,26 +23,25 @@ type Model struct {
 
 func New(path string) (Model, error) {
 
-	m := Model{}
-
 	data, err := os.ReadFile(path)
 	if errors.Is(err, fs.ErrNotExist) {
-		//si está vacio no necesitamos cargar nada.
+		return Model{}, err
 	} else if err != nil {
 		//imprimir error al abrir el archivo
-		return m, err
+		return Model{}, err
 	}
-
-	m.path = path
 
 	content := string(data)
 
-	m.ta = textarea.New()
-	m.ta.SetValue(content)
-	m.savedContent = content
-	m.ta.Focus()
+	ta := textarea.New()
+	ta.SetValue(content)
+	ta.Focus()
 
-	return m, nil
+	return Model{
+		ta:           ta,
+		path:         path,
+		savedContent: content,
+	}, nil
 }
 
 func (m Model) Init() tea.Cmd {
