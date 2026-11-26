@@ -85,3 +85,25 @@ func appendSpan(spans []Span, s Span) []Span {
 	}
 	return append(spans, s)
 }
+
+// Spans splits the document into styled ranges. The ranges cover the
+// whole document, in order, with no gaps, no empty ranges, and no two
+// neighbors with the same style. Markdown symbols are Marker ranges.
+func Spans(src []byte) []Span {
+	var out []Span
+	pos := 0
+
+	spans := textSpans(src)
+	for _, s := range spans {
+		out = appendSpan(out, Span{pos, s.Start, Marker})
+		out = appendSpan(out, s)
+		pos = s.End
+	}
+	lastGap := Span{
+		Start: pos,
+		End:   len(src),
+		Style: Marker,
+	}
+	out = appendSpan(out, lastGap)
+	return out
+}
