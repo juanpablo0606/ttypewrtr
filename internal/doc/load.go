@@ -3,7 +3,9 @@ package doc
 import (
 	"strings"
 
+	"github.com/yuin/goldmark"
 	"github.com/yuin/goldmark/ast"
+	"github.com/yuin/goldmark/text"
 	"github.com/yuin/goldmark/util"
 )
 
@@ -64,4 +66,38 @@ func inline(block ast.Node, src []byte) (string, []Span) {
 	})
 	return b.String(), spans
 
+}
+
+// Load reads a markdown document into a Doc.
+func Load(src []byte) Doc {
+	root := goldmark.DefaultParser().Parse(text.NewReader(src))
+	var d Doc
+
+	add := func(kind Kind, level int, block ast.Node) {
+		text, spans := inline(block, src)
+		d.Paras = append(d.Paras, Para{
+			Kind:  kind,
+			Level: level,
+			Text:  text,
+			Spans: spans,
+		})
+	}
+
+	for n := root.FirstChild(); n != nil; n = n.NextSibling() {
+		switch v := n.(type) {
+		case (*ast.Heading):
+			add(KindHeading, v.Level, v)
+		case (*ast.Paragraph):
+			add(KindBody, 0, v)
+		case (*ast.Blockquote):
+			for c := v.FirstChild(); c != nil; c = c.NextSibling() {
+				add(KindQuote, 0, c)
+			}
+		case (*ast.List):
+			for c := v.FirstChild(); c != nil; c = c.NextSibling() {
+				add(KindListItem, 0, c)
+			}
+		}
+	}
+	return d
 }
