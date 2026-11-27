@@ -9,6 +9,27 @@ import (
 	"github.com/yuin/goldmark/util"
 )
 
+// emptyPara is the text of an empty paragraph as Load reads it: the file
+// stores "&nbsp;", and clean turns it into a non-breaking space.
+const emptyPara = "\u00a0"
+
+// fenceAligns maps each alignment line of the file to its alignment.
+// ":::" closes a block and goes back to the document's default.
+var fenceAligns = map[string]Align{
+	"::: left":    AlignLeft,
+	"::: center":  AlignCenter,
+	"::: right":   AlignRight,
+	"::: justify": AlignJustify,
+	":::":         AlignDefault,
+}
+
+// parseFence reports whether text is an alignment line, and which
+// alignment it sets.
+func parseFence(text string) (Align, bool) {
+	n, ok := fenceAligns[text]
+	return n, ok
+}
+
 // clean turns markdown escapes and entities into the real characters.
 func clean(b []byte) []byte {
 	b = util.UnescapePunctuations(b)     // \*  → *
@@ -72,12 +93,23 @@ func inline(block ast.Node, src []byte) (string, []Span) {
 func Load(src []byte) Doc {
 	root := goldmark.DefaultParser().Parse(text.NewReader(src))
 	var d Doc
+	align := AlignDefault
 
 	add := func(kind Kind, level int, block ast.Node) {
 		text, spans := inline(block, src)
+		if kind == KindBody {
+			if a, ok := parseFence(text); ok {
+				align = a
+				return
+			}
+			if text == emptyPara {
+				text = ""
+			}
+		}
 		d.Paras = append(d.Paras, Para{
 			Kind:  kind,
 			Level: level,
+			Align: align,
 			Text:  text,
 			Spans: spans,
 		})
